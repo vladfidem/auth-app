@@ -1,21 +1,28 @@
 import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
-
-import { HomeScreen } from '../screens/HomeScreen.tsx'
-import { LoginScreen } from '../screens/LoginScreen.tsx'
-import { ProfileScreen } from '../screens/ProfileScreen.tsx'
-
-const Stack = createNativeStackNavigator()
+import { AppStack } from './AppStack.tsx'
+import { AuthStack } from './AuthStack.tsx'
+import { useAuth } from '../context/AuthContext.tsx'
 
 export const AppNavigator: React.FC = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
+  const { token, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </View>
+    )
+  }
+
+  return <NavigationContainer>{token ? <AppStack /> : <AuthStack />}</NavigationContainer>
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+})
